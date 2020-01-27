@@ -25,7 +25,7 @@ public class NoteActivity extends Activity {
                 intent.putExtra("title", ((TextView)findViewById(R.id.title)).getText().toString());
                 intent.putExtra("info", ((TextView)findViewById(R.id.info)).getText().toString());
                 intent.putExtra("date", ((TextView)findViewById(R.id.date)).getText().toString());
-
+                intent.putExtra("position", getIntent().getStringExtra("pos"));
                 startActivity(intent);
             }
         });

@@ -9,50 +9,72 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    public class note{
+        public String title, info, date, tags;
+        note(String title, String info, String date){
+            this.title = title;
+            this.info = info;
+            this.date = date;
+            this.tags = "";
+        }
+    }
     private Button addNote;
     private ListView list;
-    private String titleStr, infoStr, dateStr;
-    private ArrayList<String> notes = null;
-    ArrayAdapter<String> adapter = null;
-    private int currentElement = -1;
+    private String titleStr, infoStr, dateStr, tagsStr;
+    private ArrayList<note> noteObjects = null;
+    private String currentElement = "-1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        addListeners();
 
+        addListeners();
+        getExtraDataFromNoteActivity();
+        initializeNoteObjectsArray();
+        createList();
+    }
+
+    public void readDataFromFile(){
+
+    }
+
+    public void writeDataInFile(){
+
+    }
+
+    public void initializeNoteObjectsArray(){
+        noteObjects = new ArrayList<>();
+        noteObjects.add(new note("first", "buy milk", "05.06.2019"));
+        noteObjects.add(new note("second", "call decanat", "07.08.2019"));
+        noteObjects.add(new note("third", "write responce", "14.11.2019"));
+        if(currentElement != null){
+            if(currentElement.equals("-1")){
+                noteObjects.add(0 , new note(titleStr, infoStr, dateStr));
+            }
+            else{
+                noteObjects.set(Integer.parseInt(currentElement), new note(titleStr, infoStr, dateStr));
+            }
+        }
+    }
+
+    public void getExtraDataFromNoteActivity(){
         titleStr = getIntent().getStringExtra("title");
         infoStr = getIntent().getStringExtra("info");
         dateStr = getIntent().getStringExtra("date");
+        currentElement = getIntent().getStringExtra("position");
+    }
 
-        if(notes == null) {
-            notes = new ArrayList<>();
-            notes.add(0, "first");
-            notes.add(0, "second");
+    public void createList(){
+        ArrayList<String> notesArrayForAdapter = new ArrayList<String>();
+        for(note n : noteObjects){
+            notesArrayForAdapter.add(n.title);
         }
-
-        if(titleStr != null){
-            if(currentElement == -1){
-                notes.add(0, titleStr);
-            }
-            else{
-                notes.set(currentElement, titleStr);
-            }
-        }
-
-        if(adapter == null) {
-            adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notes);
-        }
-        else{
-            adapter.notifyDataSetChanged();
-        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notesArrayForAdapter);;
+        //adapter.notifyDataSetChanged();
         list.setAdapter(adapter);
     }
 
@@ -62,23 +84,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 Intent intent = new Intent(MainActivity.this, NoteActivity.class);
-                currentElement = -1;
+                intent.putExtra("pos", "-1");
                 startActivity(intent);
             }
         });
         list = findViewById(R.id.list);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View itemClicked, int position,
-                                    long id) {
-                /*Toast.makeText(getApplicationContext(), ((TextView) itemClicked).getText(),
-                        Toast.LENGTH_SHORT).show();*/
+            public void onItemClick(AdapterView<?> parent, View itemClicked, int position, long id) {
                 Intent intent = new Intent(MainActivity.this, NoteActivity.class);
-                currentElement = position;
+                intent.putExtra("pos", "" + position);
                 startActivity(intent);
             }
         });
     }
-
-
 }
